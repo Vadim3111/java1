@@ -1,0 +1,146 @@
+import java.util.*;
+
+public class Notebook {
+    private String brand;
+    private int ram;
+    private int storageCapacity;
+    private String operatingSystem;
+    private String color;
+
+    public Notebook(String brand, int ram, int storageCapacity, String operatingSystem, String color) {
+        this.brand = brand;
+        this.ram = ram;
+        this.storageCapacity = storageCapacity;
+        this.operatingSystem = operatingSystem;
+        this.color = color;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public int getRam() {
+        return ram;
+    }
+
+    public int getStorageCapacity() {
+        return storageCapacity;
+    }
+
+    public String getOperatingSystem() {
+        return operatingSystem;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public static void main(String[] args) {
+        Set<Notebook> notebooks = createNotebooks();
+        Map<String, Object> filters = getFiltersFromUser();
+
+        Set<Notebook> filteredNotebooks = filterNotebooks(notebooks, filters);
+
+        if (filteredNotebooks.isEmpty()) {
+            System.out.println("Ноутбуки, соответствующие заданным критериям, не найдены.");
+        } else {
+            System.out.println("Результаты фильтрации:");
+            for (Notebook notebook : filteredNotebooks) {
+                System.out.println(notebook.getBrand());
+            }
+        }
+    }
+
+    private static Set<Notebook> createNotebooks() {
+        Set<Notebook> notebooks = new HashSet<>();
+        notebooks.add(new Notebook("Lenovo", 8, 512, "Windows 10", "Silver"));
+        notebooks.add(new Notebook("HP", 16, 256, "Windows 10", "Black"));
+        notebooks.add(new Notebook("Dell", 16, 512, "Ubuntu", "White"));
+        notebooks.add(new Notebook("Apple", 16, 512, "macOS", "Silver"));
+        notebooks.add(new Notebook("Asus", 8, 256, "Windows 10", "Gold"));
+        return notebooks;
+    }
+
+    private static Map<String, Object> getFiltersFromUser() {
+        Scanner scanner = new Scanner(System.in);
+        Map<String, Object> filters = new HashMap<>();
+
+        System.out.println("Введите цифру, соответствующую необходимому критерию фильтрации:");
+        System.out.println("1 - ОЗУ");
+        System.out.println("2 - Объем ЖД");
+        System.out.println("3 - Операционная система");
+        System.out.println("4 - Цвет");
+
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Чтение символа новой строки после ввода числа
+
+        switch (choice) {
+            case 1:
+                System.out.print("Введите минимальное значение ОЗУ: ");
+                int minRam = scanner.nextInt();
+                filters.put("ram", minRam);
+                break;
+            case 2:
+                System.out.print("Введите минимальный объем ЖД (в ГБ): ");
+                int minStorageCapacity = scanner.nextInt();
+                filters.put("storageCapacity", minStorageCapacity);
+                break;
+            case 3:
+                System.out.print("Введите требуемую операционную систему: ");
+                String operatingSystem = scanner.nextLine();
+                filters.put("operatingSystem", operatingSystem);
+                break;
+            case 4:
+                System.out.print("Введите требуемый цвет: ");
+                String color = scanner.nextLine();
+                filters.put("color", color);
+                break;
+            default:
+                System.out.println("Неверный выбор.");
+        }
+
+        return filters;
+    }
+
+    private static Set<Notebook> filterNotebooks(Set<Notebook> notebooks, Map<String, Object> filters) {
+        Set<Notebook> filteredNotebooks = new HashSet<>();
+
+        for (Notebook notebook : notebooks) {
+            boolean passFilter = true;
+
+            for (Map.Entry<String, Object> entry : filters.entrySet()) {
+                String filterProperty = entry.getKey();
+                Object filterValue = entry.getValue();
+
+                switch (filterProperty) {
+                    case "ram":
+                        if (notebook.getRam() < (int) filterValue) {
+                            passFilter = false;
+                        }
+                        break;
+                    case "storageCapacity":
+                        if (notebook.getStorageCapacity() < (int) filterValue) {
+                            passFilter = false;
+                        }
+                        break;
+                    case "operatingSystem":
+                        if (!notebook.getOperatingSystem().equals(filterValue)) {
+                            passFilter = false;
+                        }
+                        break;
+                    case "color":
+                        if (!notebook.getColor().equals(filterValue)) {
+                            passFilter = false;
+                        }
+                        break;
+                }
+            }
+
+            if (passFilter) {
+                filteredNotebooks.add(notebook);
+            }
+        }
+
+        return filteredNotebooks;
+    }
+}
